@@ -1,0 +1,9 @@
+Package: com.randy420.vscc
+Name: vscc
+Depends: com.opa334.ccsupport, com.volumestep.randy420
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Control Center Modules for VolumeStep13/14
+Maintainer: Randy420
+Author: Randy420
+Section: Control Center (Modules)

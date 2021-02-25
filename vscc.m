@@ -1,9 +1,16 @@
 #import "vscc.h"
 
 #define SETTINGS_CHANGED "com.randy420.volumestepprefs.settingschanged"
-#define PREFS @"/var/mobile/Library/Preferences/com.randy420.volumestepprefs.plist"
+#define PREFS CFSTR("com.randy420.volumestepprefs")
+#define PLIST @"/var/mobile/Library/Preferences/com.randy420.volumestepprefs.plist"
 
 @implementation vscc
+static BOOL GetBool(NSString *key, BOOL defaultValue) {
+	Boolean exists;
+	Boolean result = CFPreferencesGetAppBooleanValue((CFStringRef)key, CFSTR("com.randy420.volumestepprefs"), &exists);
+	return exists ? result : defaultValue;
+}
+
 - (UIImage *)iconGlyph {
 	return [UIImage imageNamed:@"icon" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
 }
@@ -13,21 +20,16 @@
 }
 
 - (bool)isSelected {
-	NSMutableDictionary *Dict = [NSMutableDictionary dictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS]];
-
-	return [(NSNumber *)[Dict objectForKey:@"VSStepEnabled"] boolValue];
+	return GetBool(@"VSStepEnabled", NO);
 }
 
 - (void)setSelected:(bool)selected {
-	_selected = selected;
 	[super refreshState];
-	NSMutableDictionary *Dict = [NSMutableDictionary dictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS]];
-	[Dict setValue:[NSNumber numberWithBool:_selected] forKey:@"VSStepEnabled"];
-	[Dict writeToFile:PREFS atomically:YES];
-	[self post];
-}
-
--(void)post {
+	NSMutableDictionary *Dict = [NSMutableDictionary dictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfFile:PLIST]];
+	[Dict setValue:[NSNumber numberWithBool:selected] forKey:@"VSStepEnabled"];
+	[Dict writeToFile:PLIST atomically:YES];
+	CFPreferencesSetAppValue((CFStringRef)@"VSStepEnabled", (CFPropertyListRef)@(selected), PREFS);
+	CFPreferencesAppSynchronize(PREFS);
 	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(SETTINGS_CHANGED), NULL, NULL, TRUE);
 }
 @end

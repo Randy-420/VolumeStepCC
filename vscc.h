@@ -3,6 +3,5 @@
 #import <ControlCenterUIKit/CCUIToggleModule.h>
 
 @interface vscc : CCUIToggleModule {
-	BOOL _selected;
 }
 @end
